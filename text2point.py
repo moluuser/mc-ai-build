@@ -4,38 +4,38 @@ from point_e.diffusion.sampler import PointCloudSampler
 from point_e.models.download import load_checkpoint
 from point_e.models.configs import MODEL_CONFIGS, model_from_config
 
-device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
-print('creating base model...')
-base_name = 'base40M-textvec'
-base_model = model_from_config(MODEL_CONFIGS[base_name], device)
-base_model.eval()
-base_diffusion = diffusion_from_config(DIFFUSION_CONFIGS[base_name])
+def get_point_cloud_from_text(prompt):
+    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
-print('creating upsample model...')
-upsampler_model = model_from_config(MODEL_CONFIGS['upsample'], device)
-upsampler_model.eval()
-upsampler_diffusion = diffusion_from_config(DIFFUSION_CONFIGS['upsample'])
+    print('creating base model...')
+    base_name = 'base40M-textvec'
+    base_model = model_from_config(MODEL_CONFIGS[base_name], device)
+    base_model.eval()
+    base_diffusion = diffusion_from_config(DIFFUSION_CONFIGS[base_name])
 
-print('downloading base checkpoint...')
-base_model.load_state_dict(load_checkpoint(base_name, device))
+    print('creating upsample model...')
+    upsampler_model = model_from_config(MODEL_CONFIGS['upsample'], device)
+    upsampler_model.eval()
+    upsampler_diffusion = diffusion_from_config(DIFFUSION_CONFIGS['upsample'])
 
-print('downloading upsampler checkpoint...')
-upsampler_model.load_state_dict(load_checkpoint('upsample', device))
+    print('downloading base checkpoint...')
+    base_model.load_state_dict(load_checkpoint(base_name, device))
 
-print('creating sampler...')
-sampler = PointCloudSampler(
-    device=device,
-    models=[base_model, upsampler_model],
-    diffusions=[base_diffusion, upsampler_diffusion],
-    num_points=[1024, 4096 - 1024],
-    aux_channels=['R', 'G', 'B'],
-    guidance_scale=[3.0, 0.0],
-    model_kwargs_key_filter=('texts', ''),  # Do not condition the upsampler at all
-)
+    print('downloading upsampler checkpoint...')
+    upsampler_model.load_state_dict(load_checkpoint('upsample', device))
 
+    print('creating sampler...')
+    sampler = PointCloudSampler(
+        device=device,
+        models=[base_model, upsampler_model],
+        diffusions=[base_diffusion, upsampler_diffusion],
+        num_points=[1024, 4096 - 1024],
+        aux_channels=['R', 'G', 'B'],
+        guidance_scale=[3.0, 0.0],
+        model_kwargs_key_filter=('texts', ''),  # Do not condition the upsampler at all
+    )
 
-def get_point_cloud_from_prompt(prompt):
     samples = None
     for x in (sampler.sample_batch_progressive(batch_size=1, model_kwargs=dict(texts=[prompt]))):
         samples = x
