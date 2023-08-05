@@ -4,11 +4,9 @@ from point_e.diffusion.configs import diffusion_from_config, DIFFUSION_CONFIGS
 from point_e.diffusion.sampler import PointCloudSampler
 from point_e.models.configs import model_from_config, MODEL_CONFIGS
 from point_e.models.download import load_checkpoint
-from point_e.util.plotting import plot_point_cloud
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
-# Load model
 print('creating base model...')
 base_name = 'base40M'  # use base300M or base1B for better results
 base_model = model_from_config(MODEL_CONFIGS[base_name], device)
@@ -36,13 +34,11 @@ sampler = PointCloudSampler(
     guidance_scale=[3.0, 3.0],
 )
 
-img = Image.open('point_e/examples/example_data/cube_stack.jpg')
 
-# Produce a sample from the model.
-samples = None
-for x in (sampler.sample_batch_progressive(batch_size=1, model_kwargs=dict(images=[img]))):
-    samples = x
-
-pc = sampler.output_to_point_clouds(samples)[0]
-fig = plot_point_cloud(pc, grid_size=3, fixed_bounds=((-0.75, -0.75, -0.75), (0.75, 0.75, 0.75)))
-fig.show()
+def get_point_cloud_from_image(image_path):
+    img = Image.open(image_path)
+    samples = None
+    for x in (sampler.sample_batch_progressive(batch_size=1, model_kwargs=dict(images=[img]))):
+        samples = x
+    pc = sampler.output_to_point_clouds(samples)[0]
+    return pc
