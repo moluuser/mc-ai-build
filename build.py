@@ -1,5 +1,6 @@
 import os.path
 import pickle
+import time
 
 from mcpi.minecraft import Minecraft
 from color import get_block_from_rgb
@@ -8,16 +9,19 @@ from point_e.util.plotting import plot_point_cloud
 from text2point import get_point_cloud_from_text
 
 # Offset of the grid drawn in Minecraft
-Z_OFFSET = 10
+Y_OFFSET = 100
 # Object size of the grid drawn in Minecraft
-SIZE = 100
+SIZE = 50
 # Prompt to draw in Minecraft, leave empty to draw an image
 PROMPT = ''
 # Path to the image to draw in Minecraft
-IMAGE_PATH = 'images/duck.png'
+IMAGE_PATH = 'images/chick.jpg'
+# Number of objs to draw in Minecraft
+COUNT = 1
 
 
 def main():
+    time.sleep(3)
     print('connect to Minecraft...')
     mc = Minecraft.create()
     mc.postToChat('Hello Minecraft')
@@ -69,15 +73,20 @@ def main():
         _y *= SIZE
         _z *= SIZE
 
+        _y += Y_OFFSET
+
         print(_y, _z, _x)
 
         offset = 0
         if SIZE > 16:
             offset = SIZE // 33
-        for xx in range(-offset, offset + 1):
-            for yy in range(-offset, offset + 1):
-                for zz in range(-offset, offset + 1):
-                    mc.setBlock(y + _y + yy, z + _z + zz, x + _x + xx, mc_block[1], mc_block[3])
+
+        count = COUNT
+        for cc in range(-count + 1, count):
+            for xx in range(-offset, offset + 1):
+                for yy in range(-offset, offset + 1):
+                    for zz in range(-offset, offset + 1):
+                        mc.setBlock(y + _y + yy, z + _z + zz, x + _x + xx + SIZE * cc * 1.2, mc_block[1], mc_block[3])
 
 
 if __name__ == '__main__':
