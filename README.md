@@ -1,6 +1,6 @@
 # MC-AI-BUILD
 
-[English](README.md) | [简体中文](README.zh-CN.md)
+English | [简体中文](README.zh-CN.md)
 
 This project is based on OpenAI's [Point-E](https://openai.com/research/point-e) model. Players can generate Minecraft buildings through text descriptions or images.
 

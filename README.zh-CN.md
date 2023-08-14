@@ -1,6 +1,6 @@
 # MC-AI-BUILD
 
-[English](README.md) | [简体中文](README.zh-CN.md)
+[English](README.md) | 简体中文
 
 本项目基于 OpenAI 的 [Point-E](https://openai.com/research/point-e) 模型。玩家可以通过文本描述或图片来生成Minecraft建筑。
 
